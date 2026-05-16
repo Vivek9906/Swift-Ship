@@ -1,0 +1,142 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-slate-950 text-slate-100 antialiased;
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+
+  .font-mono {
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  }
+}
+
+@layer components {
+  .ops-panel {
+    @apply border border-slate-800 bg-slate-900/80 shadow-xl shadow-black/20;
+  }
+
+  .ops-input {
+    @apply rounded border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20;
+  }
+
+  .ops-button {
+    @apply inline-flex items-center justify-center gap-2 rounded bg-blue-500 px-3 py-2 text-sm font-semibold text-white transition hover:bg-blue-400 disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .ops-button-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded border border-slate-700 px-3 py-2 text-sm font-semibold text-slate-100 transition hover:border-slate-500 hover:bg-slate-800;
+  }
+
+  .light body,
+  body.light {
+    background-color: #f1f5f9;
+    color: #020617;
+  }
+
+  .chart-frame {
+    @apply relative min-h-72 max-h-72 overflow-hidden;
+  }
+
+  .chart-frame canvas {
+    @apply absolute inset-0 block;
+    width: 100% !important;
+    height: 100% !important;
+  }
+
+  .light .bg-slate-950,
+  .light .bg-slate-950\/90 {
+    background-color: #ffffff;
+  }
+
+  .light .bg-slate-900,
+  .light .bg-slate-900\/80,
+  .light .ops-panel {
+    background-color: #ffffff;
+  }
+
+  .light .hover\:bg-slate-800:hover,
+  .light .hover\:bg-slate-800\/50:hover,
+  .light .hover\:bg-slate-800\/60:hover {
+    background-color: #f1f5f9;
+  }
+
+  .light .border-slate-950,
+  .light .border-slate-900,
+  .light .border-slate-800,
+  .light .border-slate-700 {
+    border-color: #e2e8f0;
+  }
+
+  .light .ops-input {
+    background-color: #ffffff;
+    border-color: #cbd5e1;
+    color: #020617;
+  }
+
+  .light .ops-input::placeholder {
+    color: #94a3b8;
+  }
+
+  .light .ops-button-secondary {
+    border-color: #cbd5e1;
+    color: #334155;
+  }
+
+  .light .ops-button-secondary:hover {
+    background-color: #f1f5f9;
+    border-color: #94a3b8;
+  }
+
+  .light .text-slate-100,
+  .light .text-slate-200,
+  .light .text-slate-300 {
+    color: #1e293b;
+  }
+
+  .light .text-slate-400,
+  .light .text-slate-500 {
+    color: #64748b;
+  }
+
+  .light .text-blue-200,
+  .light .text-blue-300 {
+    color: #1d4ed8;
+  }
+
+  .light .text-amber-200,
+  .light .text-amber-300 {
+    color: #b45309;
+  }
+
+  .light .text-emerald-300 {
+    color: #047857;
+  }
+
+  .light .text-cyan-100 {
+    color: #0e7490;
+  }
+
+  .light .text-amber-100 {
+    color: #92400e;
+  }
+
+  .light .text-emerald-100 {
+    color: #047857;
+  }
+
+  .light .text-orange-100 {
+    color: #c2410c;
+  }
+
+  .light .text-red-100 {
+    color: #b91c1c;
+  }
+
+  .light .shadow-black\/20 {
+    --tw-shadow-color: rgb(226 232 240 / .8);
+    --tw-shadow: var(--tw-shadow-colored);
+  }
+}
