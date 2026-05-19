@@ -3,7 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Carrier;
-use App\Models\Customer;
+use App\Models\user;
 use App\Models\Shipment;
 use App\Models\TrackingEvent;
 use Illuminate\Database\Seeder;
@@ -12,7 +12,7 @@ class ShipmentSeeder extends Seeder
 {
     public function run(): void
     {
-        $customers = Customer::all();
+        $users = user::all();
         $carriers = Carrier::all();
         $cities = array_keys(Shipment::CITY_COORDINATES);
         $statuses = ['pending', 'in_transit', 'arrived_at_city', 'out_for_delivery', 'delivered', 'delayed', 'failed'];
@@ -37,15 +37,15 @@ class ShipmentSeeder extends Seeder
             $lng = $originPoint[1] + (($destinationPoint[1] - $originPoint[1]) * $progress);
 
             $shipment = Shipment::create([
-                'customer_id' => $customers[$i % $customers->count()]->id,
+                'user_id' => $users[$i % $users->count()]->id,
                 'carrier_id' => $carriers[$i % $carriers->count()]->id,
-                'sender_name' => 'Northstar FC '.($i + 1),
+                'sender_name' => 'Northstar FC ' . ($i + 1),
                 'sender_city' => $origin,
-                'receiver_name' => $customers[$i % $customers->count()]->name,
+                'receiver_name' => $users[$i % $users->count()]->name,
                 'receiver_city' => $destination,
-                'receiver_address' => (100 + $i).', Industrial Link Road, '.$destination,
+                'receiver_address' => (100 + $i) . ', Industrial Link Road, ' . $destination,
                 'weight' => random_int(5, 750) / 10,
-                'dimensions' => random_int(20, 80).'x'.random_int(20, 70).'x'.random_int(10, 60).' cm',
+                'dimensions' => random_int(20, 80) . 'x' . random_int(20, 70) . 'x' . random_int(10, 60) . ' cm',
                 'status' => $status,
                 'current_lat' => $lat,
                 'current_lng' => $lng,
@@ -66,7 +66,7 @@ class ShipmentSeeder extends Seeder
                     'location_name' => $step < 2 ? $origin : $destination,
                     'lat' => $point[0],
                     'lng' => $point[1],
-                    'description' => str($eventStatus)->headline().' scan recorded.',
+                    'description' => str($eventStatus)->headline() . ' scan recorded.',
                     'occurred_at' => $shipment->created_at->copy()->addHours($step * 9),
                 ]);
             }

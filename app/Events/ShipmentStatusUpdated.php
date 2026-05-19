@@ -15,12 +15,12 @@ class ShipmentStatusUpdated implements ShouldBroadcast
 
     public function __construct(public Shipment $shipment)
     {
-        $this->shipment->loadMissing(['customer', 'carrier']);
+        $this->shipment->loadMissing(['user', 'carrier']);
     }
 
     public function broadcastOn(): Channel
     {
-        return new Channel('shipment.'.$this->shipment->id);
+        return new Channel('shipment.' . $this->shipment->id);
     }
 
     public function broadcastAs(): string
@@ -37,7 +37,7 @@ class ShipmentStatusUpdated implements ShouldBroadcast
             'status_label' => $this->shipment->status_label,
             'lat' => (float) $this->shipment->current_lat,
             'lng' => (float) $this->shipment->current_lng,
-            'customer' => $this->shipment->customer?->name,
+            'user' => $this->shipment->user?->name,
             'carrier' => $this->shipment->carrier?->name,
             'eta' => $this->shipment->estimated_delivery?->toIso8601String(),
         ];

@@ -5,7 +5,7 @@ namespace Database\Factories;
 use App\Models\Shipment;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-class CustomerFactory extends Factory
+class userFactory extends Factory
 {
     public function definition(): array
     {
@@ -14,8 +14,8 @@ class CustomerFactory extends Factory
         return [
             'name' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
-            'phone' => '+91 '.fake()->numerify('9#########'),
-            'address' => fake()->streetAddress().', '.$city,
+            'phone' => '+91 ' . fake()->numerify('9#########'),
+            'address' => fake()->streetAddress() . ', ' . $city,
             'city' => $city,
             'status' => fake()->randomElement(['active', 'active', 'inactive']),
             'notes' => fake()->optional()->sentence(),

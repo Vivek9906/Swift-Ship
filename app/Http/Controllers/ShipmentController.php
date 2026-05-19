@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreShipmentRequest;
 use App\Models\Carrier;
-use App\Models\Customer;
+use App\Models\User;
 use App\Models\Shipment;
 use App\Models\TrackingEvent;
 use Illuminate\Http\RedirectResponse;
@@ -24,9 +24,9 @@ class ShipmentController extends Controller
         $direction = $request->string('direction')->toString() === 'asc' ? 'asc' : 'desc';
         $sortable = ['tracking_number', 'sender_city', 'receiver_city', 'status', 'estimated_delivery', 'updated_at'];
 
-        $query = Shipment::with(['customer', 'carrier'])
+        $query = Shipment::with(['user', 'carrier'])
             ->filter($request->only(['search', 'status', 'carrier_id', 'city', 'from', 'to']))
-            ->when(in_array($sort, $sortable, true), fn ($query) => $query->orderBy($sort, $direction));
+            ->when(in_array($sort, $sortable, true), fn($query) => $query->orderBy($sort, $direction));
 
         $shipments = ($sort ? $query : $query->latest())
             ->paginate(15)
@@ -35,7 +35,9 @@ class ShipmentController extends Controller
         return view('shipments.index', [
             'shipments' => $shipments,
             'carriers' => Carrier::orderBy('name')->get(),
-            'customers' => Customer::orderBy('name')->get(),
+            'users' => User::customers()
+                ->orderBy('name')
+                ->get(),
             'statuses' => Shipment::STATUSES,
             'cities' => array_keys(Shipment::CITY_COORDINATES),
         ]);
@@ -46,7 +48,9 @@ class ShipmentController extends Controller
         Gate::authorize('create', Shipment::class);
 
         return view('shipments.create', [
-            'customers' => Customer::orderBy('name')->get(),
+            'users' => User::customers()
+                ->orderBy('name')
+                ->get(),
             'carriers' => Carrier::orderBy('name')->get(),
             'statuses' => Shipment::STATUSES,
             'cities' => array_keys(Shipment::CITY_COORDINATES),
@@ -55,7 +59,13 @@ class ShipmentController extends Controller
 
     public function store(StoreShipmentRequest $request): RedirectResponse
     {
-        $shipment = Shipment::create($request->validated());
+        $data = $request->validated();
+
+        if (empty($data['estimated_delivery'])) {
+            $data['estimated_delivery'] = $this->calculateExpectedDelivery($data);
+        }
+        $data['user_id'] = auth()->id();
+        $shipment = Shipment::create($data);
         $this->recordTrackingEvent($shipment, 'Shipment registered in control tower.');
 
         return redirect()->route('shipments.show', $shipment)->with('status', 'Shipment created.');
@@ -65,7 +75,7 @@ class ShipmentController extends Controller
     {
         Gate::authorize('view', $shipment);
 
-        $shipment->load(['customer.shipments', 'carrier', 'trackingEvents']);
+        $shipment->load(['user.shipments', 'carrier', 'trackingEvents']);
         $route = [
             'origin' => Shipment::CITY_COORDINATES[$shipment->sender_city] ?? [20.5937, 78.9629],
             'destination' => Shipment::CITY_COORDINATES[$shipment->receiver_city] ?? [20.5937, 78.9629],
@@ -81,7 +91,9 @@ class ShipmentController extends Controller
 
         return view('shipments.edit', [
             'shipment' => $shipment,
-            'customers' => Customer::orderBy('name')->get(),
+            'users' => User::customers()
+                ->orderBy('name')
+                ->get(),
             'carriers' => Carrier::orderBy('name')->get(),
             'statuses' => Shipment::STATUSES,
             'cities' => array_keys(Shipment::CITY_COORDINATES),
@@ -93,12 +105,17 @@ class ShipmentController extends Controller
         Gate::authorize('update', $shipment);
 
         $oldStatus = $shipment->status;
-        $shipment->update($request->validated() + [
+        $data = $request->validated();
+        if (empty($data['estimated_delivery'])) {
+            $data['estimated_delivery'] = $this->calculateExpectedDelivery($data);
+        }
+
+        $shipment->update($data + [
             'delivered_at' => $request->status === 'delivered' ? now() : $shipment->delivered_at,
         ]);
 
         if ($oldStatus !== $shipment->status) {
-            $this->recordTrackingEvent($shipment, 'Status changed from '.str($oldStatus)->headline().' to '.$shipment->status_label.'.');
+            $this->recordTrackingEvent($shipment, 'Status changed from ' . str($oldStatus)->headline() . ' to ' . $shipment->status_label . '.');
         }
 
         return redirect()->route('shipments.show', $shipment)->with('status', 'Shipment updated.');
@@ -124,7 +141,7 @@ class ShipmentController extends Controller
             'carrier_id' => ['nullable', Rule::exists(Carrier::class, 'id')],
         ]);
 
-        $shipments = Shipment::with(['customer', 'carrier'])->whereIn('id', $validated['shipment_ids'])->get();
+        $shipments = Shipment::with(['user', 'carrier'])->whereIn('id', $validated['shipment_ids'])->get();
 
         if ($validated['action'] === 'export') {
             return $this->exportCsv($shipments);
@@ -149,11 +166,11 @@ class ShipmentController extends Controller
     {
         return Response::streamDownload(function () use ($shipments) {
             $handle = fopen('php://output', 'w');
-            fputcsv($handle, ['Tracking #', 'Customer', 'Origin', 'Destination', 'Status', 'Carrier', 'ETA']);
+            fputcsv($handle, ['Tracking #', 'user', 'Origin', 'Destination', 'Status', 'Carrier', 'ETA']);
             foreach ($shipments as $shipment) {
                 fputcsv($handle, [
                     $shipment->tracking_number,
-                    $shipment->customer?->name,
+                    $shipment->user?->name,
                     $shipment->sender_city,
                     $shipment->receiver_city,
                     $shipment->status_label,
@@ -178,5 +195,32 @@ class ShipmentController extends Controller
             'description' => $description,
             'occurred_at' => now(),
         ]);
+    }
+
+    private function calculateExpectedDelivery(array $data): \Illuminate\Support\Carbon
+    {
+        $originCity = $data['sender_city'] ?? '';
+        $destCity = $data['receiver_city'] ?? '';
+
+        $coords = Shipment::CITY_COORDINATES;
+        $origin = $coords[$originCity] ?? [20.5937, 78.9629];
+        $dest = $coords[$destCity] ?? [20.5937, 78.9629];
+
+        // Haversine formula
+        $R = 6371;
+        $dL = deg2rad($dest[0] - $origin[0]);
+        $dO = deg2rad($dest[1] - $origin[1]);
+        $a = sin($dL / 2) ** 2 + cos(deg2rad($origin[0])) * cos(deg2rad($dest[0])) * sin($dO / 2) ** 2;
+        $distKm = $R * 2 * atan2(sqrt($a), sqrt(1 - $a));
+
+        $speedKmPerDay = match ($data['service_type'] ?? 'standard') {
+            'express' => 800,
+            'same_day' => 2000,
+            'economy' => 250,
+            default => 400,
+        };
+
+        $estDays = max(1, ceil($distKm / $speedKmPerDay));
+        return now()->addDays($estDays);
     }
 }

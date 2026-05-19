@@ -20,7 +20,7 @@ class CarrierController extends Controller
 
     public function show(Carrier $carrier): View
     {
-        $carrier->load(['shipments.customer']);
+        $carrier->load(['shipments.user']);
         $metrics = [
             'total' => $carrier->shipments->count(),
             'active' => $carrier->shipments->whereIn('status', ['in_transit', 'arrived_at_city', 'out_for_delivery'])->count(),

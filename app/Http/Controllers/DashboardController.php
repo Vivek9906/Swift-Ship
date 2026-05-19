@@ -2,54 +2,83 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Carrier;
+use App\Models\User;
 use App\Models\Shipment;
-use Carbon\CarbonPeriod;
+use App\Models\Payment;
+use App\Models\TrackingEvent;
+use App\Models\ContactLead;
 use Illuminate\View\View;
 
 class DashboardController extends Controller
 {
     public function index(): View
     {
-        $totalShipments = Shipment::count();
-        $inTransit = Shipment::whereIn('status', ['in_transit', 'arrived_at_city', 'out_for_delivery'])->count();
-        $deliveredToday = Shipment::where('delivered_at', '>=', today()->startOfDay())
-            ->where('delivered_at', '<', now()->addDay()->startOfDay())
-            ->count();
-        $delayed = Shipment::where('status', 'delayed')->count();
-        $completed = Shipment::whereIn('status', ['delivered', 'delayed', 'failed'])->count();
-        $onTimeRate = $completed > 0 ? round((Shipment::where('status', 'delivered')->count() / $completed) * 100) : 100;
+        // Core stats — ALL from real database
+        $stats = [
+            'total_customers' => User::customers()->count(),
+            'total_shipments' => Shipment::count(),
+            'active_shipments' => Shipment::active()->count(),
+            'delivered_shipments' => Shipment::where('status', 'delivered')->count(),
+            'cancelled_shipments' => Shipment::where('status', 'cancelled')->count(),
+            'pending_payment' => Shipment::where('payment_status', 'pending')->count(),
+            'total_revenue' => (float) (string) Payment::paid()->sum('amount'),
+            'revenue_today' => (float) (string) Payment::paid()
+                ->where('paid_at', '>=', today())->sum('amount'),
+            'revenue_this_month' => (float) (string) Payment::paid()
+                ->where('paid_at', '>=', now()->startOfMonth())->sum('amount'),
+            'new_leads' => ContactLead::where('status', 'new')->count(),
+            'new_customers_today' => User::customers()
+                ->where('created_at', '>=', today())->count(),
+        ];
 
-        $period = CarbonPeriod::create(now()->subDays(6)->startOfDay(), now()->startOfDay());
-        $lastSevenDays = collect($period)->map(function ($date) {
-            return [
-                'label' => $date->format('D'),
-                'count' => Shipment::where('created_at', '>=', $date->copy()->startOfDay())
-                    ->where('created_at', '<', $date->copy()->addDay()->startOfDay())
-                    ->count(),
+        // Recent shipments with eager loading
+        $recent_shipments = Shipment::with(['user', 'carrier', 'payment'])
+            ->latest()->take(10)->get();
+
+        // Recent customers
+        $recent_customers = User::customers()
+            ->with('profile')->latest()->take(5)->get();
+
+        // Activity feed
+        $activity_feed = TrackingEvent::with('shipment.user')
+            ->latest()->take(15)->get();
+
+        // Revenue chart — Mongo-compatible grouping
+        $payments = Payment::paid()
+            ->where('created_at', '>=', now()->subDays(30))
+            ->get();
+        $revenue_chart = $payments->groupBy(function ($item) {
+            return $item->created_at->format('Y-m-d');
+        })->map(function ($row) {
+            return (object) [
+                'date' => $row->first()->created_at->format('Y-m-d'),
+                'total' => $row->sum('amount')
             ];
+        })->values();
+
+        // Status chart
+        $status_chart = Shipment::get(['status'])->groupBy('status')->map(function ($row, $key) {
+            return (object) ['status' => $key, 'count' => $row->count()];
+        })->values();
+
+        // Carrier performance
+        $carrier_stats = Carrier::all()->map(function ($carrier) {
+            $shipmentIds = Shipment::where('carrier_id', $carrier->id)->pluck('_id');
+            $carrier->shipments_count = $shipmentIds->count();
+            $carrier->revenue = (float) (string) Payment::whereIn('shipment_id', $shipmentIds)
+                ->paid()->sum('amount');
+            return $carrier;
         });
 
-        $statusBreakdown = collect(Shipment::STATUSES)->map(fn (string $status) => [
-            'label' => str($status)->headline()->toString(),
-            'count' => Shipment::where('status', $status)->count(),
-        ]);
-
-        $recentShipments = Shipment::with(['customer', 'carrier'])->latest()->take(5)->get();
-        $activityFeed = Shipment::with(['customer', 'carrier', 'trackingEvents'])
-            ->latest('updated_at')
-            ->take(8)
-            ->get();
-
-        return view('dashboard.index', compact(
-            'totalShipments',
-            'inTransit',
-            'deliveredToday',
-            'delayed',
-            'onTimeRate',
-            'lastSevenDays',
-            'statusBreakdown',
-            'recentShipments',
-            'activityFeed'
+        return view('admin.dashboard', compact(
+            'stats',
+            'recent_shipments',
+            'recent_customers',
+            'activity_feed',
+            'revenue_chart',
+            'status_chart',
+            'carrier_stats'
         ));
     }
 }

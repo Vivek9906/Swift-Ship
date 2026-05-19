@@ -2,11 +2,11 @@
 
 namespace App\Http\Requests;
 
-use App\Models\Customer;
+use App\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class StoreCustomerRequest extends FormRequest
+class StoreuserRequest extends FormRequest
 {
     public function authorize(): bool
     {
@@ -15,11 +15,11 @@ class StoreCustomerRequest extends FormRequest
 
     public function rules(): array
     {
-        $customerId = $this->route('customer')?->id;
+        $userId = $this->route('user')?->id;
 
         return [
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255', Rule::unique(Customer::class)->ignore($customerId)],
+            'email' => ['required', 'email', 'max:255', Rule::unique(user::class)->ignore($userId)],
             'phone' => ['required', 'string', 'max:24'],
             'address' => ['required', 'string', 'max:1000'],
             'city' => ['required', 'string', 'max:100'],

@@ -22,14 +22,14 @@ class TrackingController extends Controller
 
     public function activeShipments(Request $request): JsonResponse
     {
-        $shipments = Shipment::with(['customer', 'carrier'])
+        $shipments = Shipment::with(['user', 'carrier'])
             ->whereIn('status', ['in_transit', 'arrived_at_city', 'out_for_delivery', 'delayed'])
             ->filter($request->only(['status', 'carrier_id', 'city']))
             ->get()
-            ->map(fn (Shipment $shipment) => [
+            ->map(fn(Shipment $shipment) => [
                 'id' => $shipment->id,
                 'tracking_number' => $shipment->tracking_number,
-                'customer' => $shipment->customer?->name,
+                'user' => $shipment->user?->name,
                 'carrier' => $shipment->carrier?->name,
                 'status' => $shipment->status,
                 'status_label' => $shipment->status_label,
@@ -61,7 +61,7 @@ class TrackingController extends Controller
 
     public function publicShow(string $trackingNumber): View
     {
-        $shipment = Shipment::with(['customer', 'carrier', 'trackingEvents'])
+        $shipment = Shipment::with(['user', 'carrier', 'trackingEvents'])
             ->where('tracking_number', strtoupper($trackingNumber))
             ->first();
 
@@ -90,24 +90,24 @@ class TrackingController extends Controller
     // ADD THIS: Public tracking result via direct URL (used by home hero and new result page)
     public function publicTrack(string $tracking_number): View
     {
-        $shipment = Shipment::with(['trackingEvents', 'carrier', 'customer'])
+        $shipment = Shipment::with(['trackingEvents', 'carrier', 'user'])
             ->where('tracking_number', strtoupper($tracking_number))
             ->first();
 
         $route = null;
         if ($shipment) {
             $route = [
-                'origin'      => Shipment::CITY_COORDINATES[$shipment->sender_city]   ?? [20.5937, 78.9629],
+                'origin' => Shipment::CITY_COORDINATES[$shipment->sender_city] ?? [20.5937, 78.9629],
                 'destination' => Shipment::CITY_COORDINATES[$shipment->receiver_city] ?? [20.5937, 78.9629],
-                'current'     => [(float) $shipment->current_lat, (float) $shipment->current_lng],
+                'current' => [(float) $shipment->current_lat, (float) $shipment->current_lng],
             ];
         }
 
         return view('tracking.public-result', [
-            'shipment'        => $shipment,
+            'shipment' => $shipment,
             'tracking_number' => strtoupper($tracking_number),
-            'trackingNumber'  => strtoupper($tracking_number),
-            'route'           => $route,
+            'trackingNumber' => strtoupper($tracking_number),
+            'route' => $route,
         ]);
     }
 }

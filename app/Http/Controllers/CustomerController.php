@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreCustomerRequest;
-use App\Models\Customer;
+use App\Http\Requests\StoreUserRequest;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -12,26 +12,37 @@ class CustomerController extends Controller
 {
     public function index(Request $request): View
     {
-        $customers = Customer::filter($request->only(['search', 'status']))
+        $customers = User::whereIn('role', ['customer', 'user'])
+            ->when($request->search, function ($query, $search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                        ->orWhere('email', 'like', "%{$search}%");
+                });
+            })
             ->latest()
-            ->paginate(15)
-            ->withQueryString();
+            ->paginate(10);
 
-        $customers->getCollection()->each(function (Customer $customer) {
-            $customer->setAttribute('shipments_count', $customer->shipments()->count());
+        $customers->getCollection()->each(function (User $user) {
+            $user->setAttribute('shipments_count', $user->shipments()->count());
         });
 
         return view('customers.index', compact('customers'));
     }
 
-    public function store(StoreCustomerRequest $request): RedirectResponse
+    public function store(StoreUserRequest $request): RedirectResponse
     {
-        Customer::create($request->validated());
+        $validated = $request->validated();
+        if (!empty($validated['phone']) && preg_match('/^(\+91|91)?([6-9]\d{9})$/', $validated['phone'], $matches)) {
+            $validated['phone'] = '+91' . $matches[2];
+        }
 
-        return back()->with('status', 'Customer added.');
+        $validated['role'] = 'customer';
+        User::create($validated);
+
+        return back()->with('status', 'user added.');
     }
 
-    public function show(Customer $customer): View
+    public function show(User $customer): View
     {
         $customer->load(['shipments.carrier']);
         $stats = [
@@ -40,17 +51,23 @@ class CustomerController extends Controller
             'pending' => $customer->shipments->whereIn('status', ['pending', 'in_transit', 'out_for_delivery'])->count(),
         ];
 
-        return view('customers.show', compact('customer', 'stats'));
+        $user = $customer; // for view compatibility
+        return view('customers.show', compact('user', 'stats'));
     }
 
-    public function update(StoreCustomerRequest $request, Customer $customer): RedirectResponse
+    public function update(StoreUserRequest $request, User $customer): RedirectResponse
     {
-        $customer->update($request->validated());
+        $validated = $request->validated();
+        if (!empty($validated['phone']) && preg_match('/^(\+91|91)?([6-9]\d{9})$/', $validated['phone'], $matches)) {
+            $validated['phone'] = '+91' . $matches[2];
+        }
 
-        return back()->with('status', 'Customer updated.');
+        $customer->update($validated);
+
+        return back()->with('status', 'user updated.');
     }
 
-    public function destroy(Customer $customer): RedirectResponse
+    public function destroy(User $customer): RedirectResponse
     {
         abort_unless(auth()->user()?->isAdmin(), 403);
         $customer->delete();
