@@ -2,14 +2,14 @@
 
 namespace Database\Seeders;
 
-use App\Models\Customer;
+use App\Models\user;
 use Illuminate\Database\Seeder;
 
-class CustomerSeeder extends Seeder
+class userSeeder extends Seeder
 {
     public function run(): void
     {
-        $customers = [
+        $users = [
             ['Aarav Sharma', 'aarav.sharma@example.test', 'Mumbai'],
             ['Ananya Iyer', 'ananya.iyer@example.test', 'Chennai'],
             ['Rohan Gupta', 'rohan.gupta@example.test', 'Delhi'],
@@ -27,11 +27,11 @@ class CustomerSeeder extends Seeder
             ['Aditya Bose', 'aditya.bose@example.test', 'Kolkata'],
         ];
 
-        foreach ($customers as $index => [$name, $email, $city]) {
-            Customer::updateOrCreate(['email' => $email], [
+        foreach ($users as $index => [$name, $email, $city]) {
+            user::updateOrCreate(['email' => $email], [
                 'name' => $name,
-                'phone' => '+91 9'.str_pad((string) (800000000 + $index * 7311), 9, '0', STR_PAD_LEFT),
-                'address' => ($index + 11).', Logistics Park Road, '.$city,
+                'phone' => '+91 9' . str_pad((string) (800000000 + $index * 7311), 9, '0', STR_PAD_LEFT),
+                'address' => ($index + 11) . ', Logistics Park Road, ' . $city,
                 'city' => $city,
                 'status' => $index % 6 === 0 ? 'inactive' : 'active',
                 'notes' => 'Preferred delivery window: business hours.',

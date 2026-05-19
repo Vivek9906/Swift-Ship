@@ -6,7 +6,7 @@
 <div class="space-y-5" x-data="{ addOpen: false }">
     <div class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
         <form class="grid gap-3 sm:grid-cols-2 lg:grid-cols-6" method="GET">
-            <input name="search" value="{{ request('search') }}" placeholder="Search tracking, customer, city" class="ops-input lg:col-span-2">
+            <input name="search" value="{{ request('search') }}" placeholder="Search tracking, user, city" class="ops-input lg:col-span-2">
             <select name="status" class="ops-input">
                 <option value="">All statuses</option>
                 @foreach($statuses as $status)
@@ -56,7 +56,7 @@
                         <th class="px-4 py-3"></th>
                         @foreach([
                             'tracking_number' => 'Tracking ID',
-                            'customer' => 'Customer',
+                            'user' => 'user',
                             'sender_city' => 'Origin',
                             'receiver_city' => 'Destination',
                             'status' => 'Status',

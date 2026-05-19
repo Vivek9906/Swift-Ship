@@ -18,12 +18,25 @@ class Carrier extends Model
         'on_time_rate',
         'rating',
         'active_shipments',
+        'base_rate',
+        'per_kg_rate',
+        'per_km_rate',
+        'est_days_min',
+        'est_days_max',
+        'services',
+        'is_active',
     ];
 
     protected function casts(): array
     {
         return [
-            'rating' => 'decimal:1',
+            'rating'        => 'decimal:1',
+            'base_rate'     => 'decimal:2',
+            'per_kg_rate'   => 'decimal:2',
+            'per_km_rate'   => 'decimal:4',
+            'est_days_min'  => 'integer',
+            'est_days_max'  => 'integer',
+            'is_active'     => 'boolean',
         ];
     }
 

@@ -15,7 +15,7 @@ class ShipmentDelayed extends Notification implements ShouldQueue, ShouldBroadca
 
     public function __construct(public Shipment $shipment)
     {
-        $this->shipment->loadMissing('customer');
+        $this->shipment->loadMissing('user');
     }
 
     public function via(object $notifiable): array
@@ -28,7 +28,7 @@ class ShipmentDelayed extends Notification implements ShouldQueue, ShouldBroadca
         return [
             'shipment_id' => $this->shipment->id,
             'tracking_number' => $this->shipment->tracking_number,
-            'customer' => $this->shipment->customer?->name,
+            'user' => $this->shipment->user?->name,
             'message' => "Shipment {$this->shipment->tracking_number} is delayed.",
             'status' => $this->shipment->status,
             'eta' => $this->shipment->estimated_delivery?->toDateTimeString(),
