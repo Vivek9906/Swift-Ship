@@ -36,6 +36,11 @@ class CustomerController extends Controller
             $validated['phone'] = '+91' . $matches[2];
         }
 
+        if (isset($validated['status'])) {
+            $validated['is_active'] = $validated['status'] === 'active';
+            unset($validated['status']);
+        }
+
         $validated['role'] = 'customer';
         User::create($validated);
 
@@ -60,6 +65,11 @@ class CustomerController extends Controller
         $validated = $request->validated();
         if (!empty($validated['phone']) && preg_match('/^(\+91|91)?([6-9]\d{9})$/', $validated['phone'], $matches)) {
             $validated['phone'] = '+91' . $matches[2];
+        }
+
+        if (isset($validated['status'])) {
+            $validated['is_active'] = $validated['status'] === 'active';
+            unset($validated['status']);
         }
 
         $customer->update($validated);
