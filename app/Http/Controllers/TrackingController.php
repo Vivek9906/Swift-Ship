@@ -43,8 +43,13 @@ class TrackingController extends Controller
         return response()->json($shipments);
     }
 
-    public function lookup(): View
+    public function lookup(Request $request)
     {
+        if ($request->filled('tracking_number')) {
+            return redirect()->route('tracking.public.show', [
+                'trackingNumber' => strtoupper(trim($request->input('tracking_number'))),
+            ]);
+        }
         return view('tracking.lookup');
     }
 

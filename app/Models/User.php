@@ -20,6 +20,11 @@ class User extends Authenticatable
         'phone',
         'password',
         'role',
+<<<<<<< Updated upstream
+        'is_active',
+=======
+        'status',
+>>>>>>> Stashed changes
     ];
 
     protected $hidden = [

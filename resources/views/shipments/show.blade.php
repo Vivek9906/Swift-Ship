@@ -75,7 +75,7 @@
                                 <time
                                     class="font-mono text-xs text-slate-500">{{ $event->occurred_at->format('M d, H:i') }}</time>
                             </div>
-                            <p class="text-sm text-slate-400">{{ $event->location_name }} Â· {{ $event->description }}</p>
+                            <p class="text-sm text-slate-400">{{ $event->location_name }} · {{ $event->description }}</p>
                         </li>
                     @endforeach
                 </ol>

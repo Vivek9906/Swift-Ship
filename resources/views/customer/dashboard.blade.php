@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="en" x-data="{ mobileMenu: false, userMenu: false }">
 
 <head>
@@ -158,7 +158,7 @@
       {{-- Header --}}
       <div class="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 class="text-2xl font-black text-white">Welcome back, {{ auth()->user()->name }}! ðŸ‘‹</h1>
+          <h1 class="text-2xl font-black text-white">Welcome back, {{ auth()->user()->name }}! 👋</h1>
           <p class="text-slate-400 text-sm mt-1">Here's an overview of your shipments</p>
         </div>
         <a href="{{ route('customer.shipments.new') }}"

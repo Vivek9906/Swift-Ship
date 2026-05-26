@@ -11,6 +11,7 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         $users = [
+            ['SwiftShip Admin', 'admin@swiftship.com', 'admin'],
             ['Ops Admin', 'admin@logistics.test', 'admin'],
             ['Riya Manager', 'riya.manager@logistics.test', 'manager'],
             ['Arjun Manager', 'arjun.manager@logistics.test', 'manager'],
@@ -21,7 +22,7 @@ class UserSeeder extends Seeder
         foreach ($users as [$name, $email, $role]) {
             User::updateOrCreate(['email' => $email], [
                 'name' => $name,
-                'password' => Hash::make('password'),
+                'password' => Hash::make($email === 'admin@swiftship.com' ? 'admin123' : 'password'),
                 'role' => $role,
                 'email_verified_at' => now(),
             ]);

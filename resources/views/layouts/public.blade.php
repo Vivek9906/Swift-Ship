@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" x-data="{
           scrolled: false,
           mobileMenu: false,
@@ -303,7 +303,7 @@
                                 <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
                                 <circle cx="12" cy="10" r="3" />
                             </svg>
-                            Mumbai HQ Â· Pan-India Network
+                            Mumbai HQ · Pan-India Network
                         </li>
                     </ul>
                 </div>

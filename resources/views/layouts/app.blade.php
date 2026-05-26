@@ -99,7 +99,7 @@
                         </button>
                         <div>
                             <h1 class="text-lg font-bold text-white">@yield('title', 'Dashboard')</h1>
-                            <p class="hidden text-xs text-slate-400 sm:block">SwiftShip Â· Synced at
+                            <p class="hidden text-xs text-slate-400 sm:block">SwiftShip · Synced at
                                 {{ now()->format('H:i') }} IST</p>
                         </div>
                     </div>
@@ -118,7 +118,7 @@
                         <a href="{{ route('tracking.lookup') }}"
                             class="hidden ops-button-secondary sm:inline-flex">Track</a>
                         <button class="ops-button-secondary" @click="theme = theme === 'dark' ? 'light' : 'dark'"
-                            x-text="theme === 'dark' ? 'â˜€ Light' : 'ðŸŒ™ Dark'"></button>
+                            x-text="theme === 'dark' ? '☀️ Light' : '🌙 Dark'"></button>
                         @auth
                             <span class="hidden text-sm text-slate-300 md:inline">{{ auth()->user()->name }}</span>
                         @endauth

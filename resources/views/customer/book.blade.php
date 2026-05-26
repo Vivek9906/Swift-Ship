@@ -361,9 +361,9 @@
                       </div>
                       <div>
                         <p class="font-bold text-white text-sm">{{ $carrier->name }}</p>
-                        <p class="text-xs text-slate-400">{{ $carrier->est_days_min }}â€“{{ $carrier->est_days_max }}
+                        <p class="text-xs text-slate-400">{{ $carrier->est_days_min }}–{{ $carrier->est_days_max }}
                           business days</p>
-                        <p class="text-xs text-slate-500">{{ ucfirst($carrier->type) }} Â· Rating {{ $carrier->rating }}/5
+                        <p class="text-xs text-slate-500">{{ ucfirst($carrier->type) }} · Rating {{ $carrier->rating }}/5
                         </p>
                       </div>
                     </div>

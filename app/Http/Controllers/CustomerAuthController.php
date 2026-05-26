@@ -68,6 +68,7 @@ class CustomerAuthController extends Controller
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
             'role' => 'customer',
+            'status' => 'active',
         ]);
 
         UserProfile::create([

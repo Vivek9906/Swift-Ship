@@ -24,7 +24,7 @@ class RegisteredcustomerController extends Controller
         $request->validate([
             'name' => ['required', 'string', 'min:2', 'max:100'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
-            'phone' => ['required', 'string', 'regex:/^(\+91)?[6-9]\d{9}$/'],
+            'phone' => ['required', 'string', 'regex:/^(\+91|91)?[6-9]\d{9}$/'],
             'password' => ['required', 'confirmed', Password::min(8)->mixedCase()->numbers()],
             'terms' => ['required', 'accepted'],
         ], [
@@ -33,16 +33,15 @@ class RegisteredcustomerController extends Controller
             'password.min' => 'Password must be at least 8 characters.',
         ]);
 
-        // Normalise phone
-        $phone = preg_replace('/\D/', '', $request->phone);
-        if (strlen($phone) === 10) {
-            $phone = '+91' . $phone;
+        $normalizedPhone = $request->phone;
+        if (preg_match('/^(\+91|91)?([6-9]\d{9})$/', $normalizedPhone, $matches)) {
+            $normalizedPhone = '+91' . $matches[2];
         }
 
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
-            'phone' => $phone,
+            'phone' => $normalizedPhone,
             'password' => Hash::make($request->password),
             'role' => 'user',
         ]);
