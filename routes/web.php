@@ -57,6 +57,9 @@ Route::middleware(['auth', 'customer'])->group(function () {
     Route::get('/shipments/{id}/confirmation', [BookingController::class, 'confirmation'])->name('customer.shipments.confirmation');
     Route::post('/shipments/stripe-checkout', [BookingController::class, 'stripeCheckout'])->name('customer.shipments.stripe-checkout');
     Route::get('/shipments/stripe-success', [BookingController::class, 'stripeSuccess'])->name('customer.shipments.stripe-success');
+    Route::post('/shipments/pay-simulate', [BookingController::class, 'simulatePaymentSuccess'])->name('customer.shipments.pay-simulate');
+    Route::get('/shipments/{id}/resume-payment', [BookingController::class, 'resumePayment'])->name('customer.shipments.resume-payment');
+    Route::delete('/shipments/{id}/delete', [CustomerDashboardController::class, 'deleteShipment'])->name('customer.shipments.delete');
 });
 
 // Stripe Webhook

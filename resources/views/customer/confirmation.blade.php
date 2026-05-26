@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="en">
 
 <head>
@@ -48,7 +48,7 @@
       </svg>
     </div>
 
-    <h1 class="text-3xl font-black text-white mb-2">Booking Confirmed! ðŸŽ‰</h1>
+    <h1 class="text-3xl font-black text-white mb-2">Booking Confirmed! 🎉</h1>
     <p class="text-slate-400 mb-6">Your shipment has been successfully registered.</p>
 
     {{-- Tracking ID --}}
@@ -73,7 +73,7 @@
         <div class="flex justify-between"><span class="text-slate-400">Service</span><span
             class="text-white font-medium capitalize">{{ $shipment->service_type }}</span></div>
         <div class="flex justify-between"><span class="text-slate-400">Package</span><span
-            class="text-white font-medium">{{ $shipment->package_type }} Â· {{ $shipment->weight }} kg</span></div>
+            class="text-white font-medium">{{ $shipment->package_type }} · {{ $shipment->weight }} kg</span></div>
         <div class="flex justify-between"><span class="text-slate-400">Est. Delivery</span><span
             class="text-white font-medium">{{ $shipment->estimated_delivery?->format('D, M d Y') ?? 'TBD' }}</span>
         </div>
@@ -84,7 +84,7 @@
       </div>
     </div>
 
-    <p class="text-xs text-slate-500 mb-6">ðŸ“§ Confirmation sent to <span
+    <p class="text-xs text-slate-500 mb-6">📧 Confirmation sent to <span
         class="text-slate-300">{{ auth()->user()->email }}</span></p>
 
     <div class="flex flex-col sm:flex-row gap-3">

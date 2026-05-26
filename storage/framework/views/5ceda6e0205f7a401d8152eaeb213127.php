@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" x-data="{
+<html lang="<?php echo e(str_replace('_', '-', app()->getLocale())); ?>" x-data="{
           scrolled: false,
           mobileMenu: false,
           showTop: false
@@ -10,19 +10,19 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>SwiftShip | @yield('page_title', 'Real-Time Logistics')</title>
+    <meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
+    <title>SwiftShip | <?php echo $__env->yieldContent('page_title', 'Real-Time Logistics'); ?></title>
     <meta name="description"
-        content="@yield('meta_description', 'Track shipments in real-time across India. SwiftShip delivers logistics precision with 50,000+ parcels shipped and 99.8% on-time rate.')">
+        content="<?php echo $__env->yieldContent('meta_description', 'Track shipments in real-time across India. SwiftShip delivers logistics precision with 50,000+ parcels shipped and 99.8% on-time rate.'); ?>">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <?php echo app('Illuminate\Foundation\Vite')(['resources/css/app.css', 'resources/js/app.js']); ?>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    @stack('head_scripts')
+    <?php echo $__env->yieldPushContent('head_scripts'); ?>
     <style>
         /* Public layout overrides */
         .pub-nav {
@@ -90,32 +90,32 @@
 <body class="min-h-screen bg-slate-950 text-slate-100"
     style="font-family: Inter, ui-sans-serif, system-ui, sans-serif;">
 
-    {{-- ===== STICKY NAVBAR ===== --}}
+    
     <nav class="pub-nav" :class="{ 'scrolled': scrolled }">
         <div class="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-            {{-- Logo --}}
-            <a href="{{ route('home') }}" class="flex items-center gap-3 flex-shrink-0">
+            
+            <a href="<?php echo e(route('home')); ?>" class="flex items-center gap-3 flex-shrink-0">
                 <span
                     class="grid h-9 w-9 place-items-center rounded-lg bg-amber-400 font-mono font-black text-slate-950 text-sm shadow-lg shadow-amber-500/20">SS</span>
                 <span class="text-lg font-extrabold tracking-tight text-white">Swift<span
                         class="text-amber-400">Ship</span></span>
             </a>
 
-            {{-- Desktop Nav --}}
+            
             <div class="hidden md:flex items-center gap-7">
-                <a href="{{ route('home') }}"
-                    class="pub-nav-link {{ request()->routeIs('home') ? 'active' : '' }}">Home</a>
-                <a href="{{ route('tracking.lookup') }}"
-                    class="pub-nav-link {{ request()->routeIs('tracking.*') ? 'active' : '' }}">Track Shipment</a>
-                <a href="{{ route('home') }}#about" class="pub-nav-link">About</a>
-                <a href="{{ route('home') }}#contact" class="pub-nav-link">Contact</a>
+                <a href="<?php echo e(route('home')); ?>"
+                    class="pub-nav-link <?php echo e(request()->routeIs('home') ? 'active' : ''); ?>">Home</a>
+                <a href="<?php echo e(route('tracking.lookup')); ?>"
+                    class="pub-nav-link <?php echo e(request()->routeIs('tracking.*') ? 'active' : ''); ?>">Track Shipment</a>
+                <a href="<?php echo e(route('home')); ?>#about" class="pub-nav-link">About</a>
+                <a href="<?php echo e(route('home')); ?>#contact" class="pub-nav-link">Contact</a>
             </div>
 
-            {{-- CTA + Mobile Toggle --}}
+            
             <div class="flex items-center gap-3">
-                @auth
-                    @if(auth()->user()->role === 'admin' || auth()->user()->role === 'staff')
-                        <a href="{{ route('admin.dashboard') }}" class="btn-outline-amber">
+                <?php if(auth()->guard()->check()): ?>
+                    <?php if(auth()->user()->role === 'admin' || auth()->user()->role === 'staff'): ?>
+                        <a href="<?php echo e(route('admin.dashboard')); ?>" class="btn-outline-amber">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
                                 stroke-linecap="round" stroke-linejoin="round">
                                 <rect x="3" y="3" width="7" height="7" />
@@ -125,8 +125,8 @@
                             </svg>
                             Dashboard
                         </a>
-                    @else
-                        <a href="{{ route('customer.dashboard') }}" class="btn-outline-amber">
+                    <?php else: ?>
+                        <a href="<?php echo e(route('customer.dashboard')); ?>" class="btn-outline-amber">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
                                 stroke-linecap="round" stroke-linejoin="round">
                                 <rect x="3" y="3" width="7" height="7" />
@@ -136,17 +136,17 @@
                             </svg>
                             Dashboard
                         </a>
-                    @endif
-                    <form method="POST" action="{{ route('logout') }}" class="inline">
-                        @csrf
+                    <?php endif; ?>
+                    <form method="POST" action="<?php echo e(route('logout')); ?>" class="inline">
+                        <?php echo csrf_field(); ?>
                         <button type="submit"
                             class="text-sm font-semibold text-slate-300 hover:text-white transition ml-3">Logout</button>
                     </form>
-                @else
-                    <a href="{{ route('login') }}"
+                <?php else: ?>
+                    <a href="<?php echo e(route('login')); ?>"
                         class="text-sm font-semibold text-slate-300 hover:text-white transition mr-2 hidden sm:block">Login</a>
-                    <a href="{{ route('register') }}" class="btn-outline-amber">Register</a>
-                @endauth
+                    <a href="<?php echo e(route('register')); ?>" class="btn-outline-amber">Register</a>
+                <?php endif; ?>
 
                 <button class="md:hidden text-slate-400 hover:text-white transition p-1"
                     @click="mobileMenu = !mobileMenu" aria-label="Toggle menu">
@@ -165,61 +165,61 @@
             </div>
         </div>
 
-        {{-- Mobile Menu --}}
+        
         <div x-show="mobileMenu" x-transition:enter="transition ease-out duration-200"
             x-transition:enter-start="opacity-0 -translate-y-2" x-transition:enter-end="opacity-100 translate-y-0"
             x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100"
             x-transition:leave-end="opacity-0 -translate-y-2"
             class="md:hidden border-t border-slate-800 bg-slate-950/98 backdrop-blur px-4 py-4 space-y-3"
             @click.away="mobileMenu = false">
-            <a href="{{ route('home') }}"
+            <a href="<?php echo e(route('home')); ?>"
                 class="block py-2 text-sm font-medium text-slate-300 hover:text-white transition"
                 @click="mobileMenu = false">Home</a>
-            <a href="{{ route('tracking.lookup') }}"
+            <a href="<?php echo e(route('tracking.lookup')); ?>"
                 class="block py-2 text-sm font-medium text-slate-300 hover:text-white transition"
                 @click="mobileMenu = false">Track Shipment</a>
-            <a href="{{ route('home') }}#about"
+            <a href="<?php echo e(route('home')); ?>#about"
                 class="block py-2 text-sm font-medium text-slate-300 hover:text-white transition"
                 @click="mobileMenu = false">About</a>
-            <a href="{{ route('home') }}#contact"
+            <a href="<?php echo e(route('home')); ?>#contact"
                 class="block py-2 text-sm font-medium text-slate-300 hover:text-white transition"
                 @click="mobileMenu = false">Contact</a>
-            @auth
-                @if(auth()->user()->role === 'admin' || auth()->user()->role === 'staff')
-                    <a href="{{ route('admin.dashboard') }}"
+            <?php if(auth()->guard()->check()): ?>
+                <?php if(auth()->user()->role === 'admin' || auth()->user()->role === 'staff'): ?>
+                    <a href="<?php echo e(route('admin.dashboard')); ?>"
                         class="block py-2 text-sm font-semibold text-amber-400 hover:text-amber-300 transition"
                         @click="mobileMenu = false">Dashboard</a>
-                @else
-                    <a href="{{ route('customer.dashboard') }}"
+                <?php else: ?>
+                    <a href="<?php echo e(route('customer.dashboard')); ?>"
                         class="block py-2 text-sm font-semibold text-amber-400 hover:text-amber-300 transition"
                         @click="mobileMenu = false">Dashboard</a>
-                @endif
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
+                <?php endif; ?>
+                <form method="POST" action="<?php echo e(route('logout')); ?>">
+                    <?php echo csrf_field(); ?>
                     <button type="submit"
                         class="block w-full text-left py-2 text-sm font-medium text-slate-300 hover:text-white transition">Logout</button>
                 </form>
-            @else
-                <a href="{{ route('login') }}"
+            <?php else: ?>
+                <a href="<?php echo e(route('login')); ?>"
                     class="block py-2 text-sm font-medium text-slate-300 hover:text-white transition"
                     @click="mobileMenu = false">Login</a>
-                <a href="{{ route('register') }}"
+                <a href="<?php echo e(route('register')); ?>"
                     class="block py-2 text-sm font-medium text-slate-300 hover:text-white transition"
                     @click="mobileMenu = false">Register</a>
-            @endauth
+            <?php endif; ?>
         </div>
     </nav>
 
-    {{-- Page Content --}}
+    
     <main>
-        @yield('content')
+        <?php echo $__env->yieldContent('content'); ?>
     </main>
 
-    {{-- ===== FOOTER ===== --}}
+    
     <footer class="pub-footer" id="contact">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-14">
             <div class="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4">
-                {{-- Brand --}}
+                
                 <div>
                     <div class="flex items-center gap-2 mb-4">
                         <span
@@ -257,24 +257,24 @@
                     </div>
                 </div>
 
-                {{-- Quick Links --}}
+                
                 <div>
                     <h3 class="text-sm font-semibold uppercase tracking-wider text-slate-300 mb-4">Quick Links</h3>
                     <ul class="space-y-3">
-                        <li><a href="{{ route('home') }}"
+                        <li><a href="<?php echo e(route('home')); ?>"
                                 class="text-sm text-slate-400 hover:text-white transition">Home</a></li>
-                        <li><a href="{{ route('tracking.lookup') }}"
+                        <li><a href="<?php echo e(route('tracking.lookup')); ?>"
                                 class="text-sm text-slate-400 hover:text-white transition">Track Shipment</a></li>
-                        <li><a href="{{ route('home') }}#how-it-works"
+                        <li><a href="<?php echo e(route('home')); ?>#how-it-works"
                                 class="text-sm text-slate-400 hover:text-white transition">How It Works</a></li>
-                        <li><a href="{{ route('home') }}#features"
+                        <li><a href="<?php echo e(route('home')); ?>#features"
                                 class="text-sm text-slate-400 hover:text-white transition">Features</a></li>
-                        <li><a href="{{ route('login') }}"
+                        <li><a href="<?php echo e(route('login')); ?>"
                                 class="text-sm text-slate-400 hover:text-white transition">Admin Portal</a></li>
                     </ul>
                 </div>
 
-                {{-- Contact Info --}}
+                
                 <div>
                     <h3 class="text-sm font-semibold uppercase tracking-wider text-slate-300 mb-4">Contact Us</h3>
                     <ul class="space-y-3">
@@ -308,7 +308,7 @@
                     </ul>
                 </div>
 
-                {{-- Carriers --}}
+                
                 <div>
                     <h3 class="text-sm font-semibold uppercase tracking-wider text-slate-300 mb-4">Partner Carriers</h3>
                     <ul class="space-y-3">
@@ -328,7 +328,7 @@
 
             <div
                 class="mt-10 pt-6 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
-                <p class="text-xs text-slate-500">Â© {{ date('Y') }} {{ config('app.name', 'SwiftShip') }}. All rights
+                <p class="text-xs text-slate-500">Â© <?php echo e(date('Y')); ?> <?php echo e(config('app.name', 'SwiftShip')); ?>. All rights
                     reserved. Built with precision.</p>
                 <div class="flex gap-5 text-xs text-slate-500">
                     <a href="#" class="hover:text-slate-300 transition">Privacy Policy</a>
@@ -339,7 +339,7 @@
         </div>
     </footer>
 
-    {{-- Back-to-top button --}}
+    
     <button x-show="showTop" x-transition:enter="transition ease-out duration-200"
         x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0"
         x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100"
@@ -352,7 +352,8 @@
         </svg>
     </button>
 
-    @stack('scripts')
+    <?php echo $__env->yieldPushContent('scripts'); ?>
 </body>
 
 </html>
+<?php /**PATH D:\Swift-Ship\resources\views/layouts/public.blade.php ENDPATH**/ ?>

@@ -374,6 +374,62 @@ class BookingController extends Controller
         ];
     }
 
+    public function simulatePaymentSuccess(Request $request): RedirectResponse
+    {
+        $shipmentId = session('pending_shipment_id');
+        if (!$shipmentId) {
+            return redirect()->route('customer.dashboard')->with('error', 'No pending shipment found.');
+        }
+
+        $shipment = Shipment::findOrFail($shipmentId);
+        $payment = Payment::where('shipment_id', $shipment->id)->first();
+
+        if ($payment) {
+            $payment->update([
+                'status' => 'paid',
+                'paid_at' => now(),
+                'gateway' => 'swiftpay',
+                'transaction_id' => 'TXN' . strtoupper(Str::random(12)),
+            ]);
+        }
+
+        $shipment->update([
+            'status' => 'confirmed',
+            'payment_status' => 'paid',
+            'updated_at' => now(),
+        ]);
+
+        TrackingEvent::create([
+            'shipment_id' => $shipment->id,
+            'status' => 'confirmed',
+            'location_name' => $shipment->sender_city,
+            'description' => 'Shipment booked and payment confirmed via SwiftPay Local Gateway.',
+            'occurred_at' => now(),
+        ]);
+
+        try {
+            Mail::to(auth()->user()->email)
+                ->send(new \App\Mail\ShipmentConfirmed($shipment, $payment));
+        } catch (\Throwable) {
+        }
+
+        session()->forget('pending_shipment_id');
+
+        return redirect()->route('customer.dashboard', ['booked' => $shipment->tracking_number])
+            ->with('success', 'Payment successful! Your shipment is now confirmed and tracking is active.');
+    }
+
+    public function resumePayment(string $id): RedirectResponse
+    {
+        $shipment = Shipment::where('id', $id)
+            ->where('user_id', auth()->id())
+            ->where('payment_status', 'pending')
+            ->firstOrFail();
+
+        session(['pending_shipment_id' => $shipment->id]);
+        return redirect()->route('customer.shipments.pay');
+    }
+
     private function haversineKm(float $lat1, float $lon1, float $lat2, float $lon2): float
     {
         $R = 6371;

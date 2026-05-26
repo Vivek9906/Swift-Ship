@@ -1,18 +1,16 @@
-@extends('layouts.app')
+<?php $__env->startSection('title', 'Complete Payment'); ?>
 
-@section('title', 'Complete Payment')
-
-@section('content')
+<?php $__env->startSection('content'); ?>
 <div class="py-2">
   <div class="mx-auto max-w-7xl">
     
-    {{-- Main Responsive Grid Layout --}}
+    
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start" x-data="paymentGateway()">
       
-      {{-- Left Column: Interactive Secure Checkout Gateway (Spans 8 cols on desktop) --}}
+      
       <div class="lg:col-span-8 rounded-2xl border border-slate-800 bg-slate-900/80 p-6 sm:p-8 space-y-6 relative overflow-hidden">
         
-        {{-- Loader & Verification Overlay --}}
+        
         <div x-show="processing" x-transition.opacity 
              class="absolute inset-0 bg-slate-950/95 z-50 flex flex-col items-center justify-center text-center p-6 backdrop-blur-md">
           <div class="relative w-20 h-20 mb-6">
@@ -23,7 +21,7 @@
           <p class="text-xs text-slate-400 animate-pulse">Contacting NPCI Payment Gateways. Please do not close or refresh this page.</p>
         </div>
 
-        {{-- Header --}}
+        
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-slate-800/80 pb-5 gap-3">
           <div>
             <h2 class="text-2xl font-black text-white tracking-tight">Secure Payment Gateway</h2>
@@ -34,37 +32,37 @@
           </div>
         </div>
 
-        {{-- Payment Methods Navigation --}}
+        
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          @foreach([
+          <?php $__currentLoopData = [
             'upi' => ['⚡ Real UPI QR & VPA', 'GPay / PhonePe / Paytm / BHIM', 'border-amber-400/30'],
             'card' => ['💳 Card Checkout', 'Credit / Debit Card Sim', 'border-blue-400/30'],
             'netbanking' => ['🏦 Netbanking Sim', 'Top Indian Retail Banks', 'border-purple-400/30']
-          ] as $tab => [$title, $sub, $borderColor])
-            <button @click="activeTab = '{{ $tab }}'"
+          ]; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $tab => [$title, $sub, $borderColor]): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+            <button @click="activeTab = '<?php echo e($tab); ?>'"
                     type="button"
                     class="rounded-xl p-3.5 border text-left transition-all duration-200 outline-none"
-                    :class="activeTab == '{{ $tab }}' ? 'bg-amber-400/10 border-amber-400 text-white shadow-lg shadow-amber-500/5' : 'border-slate-800 bg-slate-950/40 text-slate-400 hover:border-slate-700'">
-              <span class="block text-sm font-bold tracking-wide" :class="activeTab == '{{ $tab }}' ? 'text-amber-400' : 'text-slate-200'">{{ $title }}</span>
-              <span class="block text-[10px] text-slate-500 mt-1 leading-normal">{{ $sub }}</span>
+                    :class="activeTab == '<?php echo e($tab); ?>' ? 'bg-amber-400/10 border-amber-400 text-white shadow-lg shadow-amber-500/5' : 'border-slate-800 bg-slate-950/40 text-slate-400 hover:border-slate-700'">
+              <span class="block text-sm font-bold tracking-wide" :class="activeTab == '<?php echo e($tab); ?>' ? 'text-amber-400' : 'text-slate-200'"><?php echo e($title); ?></span>
+              <span class="block text-[10px] text-slate-500 mt-1 leading-normal"><?php echo e($sub); ?></span>
             </button>
-          @endforeach
+          <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         </div>
 
-        {{-- TAB VIEWPORTS --}}
+        
         <div class="mt-6 border border-slate-800/80 rounded-xl bg-slate-950/20 p-5 sm:p-6">
           
-          {{-- 1. REAL UPI QR GATEWAY --}}
+          
           <div x-show="activeTab == 'upi'" x-transition class="space-y-6">
             
-            {{-- Safe Sandbox Banner --}}
+            
             <div class="rounded-lg border border-blue-500/20 bg-blue-500/5 px-4 py-3 text-xs text-slate-300 leading-relaxed">
               💡 <strong class="text-blue-300">How to test dynamic deduction:</strong> Enter <span class="font-bold text-amber-400">your own UPI ID</span> below. GPay/PhonePe will safely deduct the amount from your bank and deposit it <strong>directly back to yourself</strong>! This allows you to test the complete genuine banking pipeline with zero actual net cost.
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
               
-              {{-- QR Code Card (Left) --}}
+              
               <div class="md:col-span-5 flex flex-col items-center justify-center p-4 rounded-xl border border-slate-800 bg-slate-900/60 shadow-inner">
                 <div class="relative bg-white rounded-xl p-3 shadow-xl shadow-black/40 flex items-center justify-center">
                   <img :src="'https://api.qrserver.com/v1/create-qr-code/?size=200x200&margin=8&data=' + encodeURIComponent(generateUpiUri())" 
@@ -78,7 +76,7 @@
                 </div>
               </div>
 
-              {{-- UPI Input Details (Right) --}}
+              
               <div class="md:col-span-7 space-y-4">
                 <div>
                   <h4 class="text-base font-bold text-white mb-1">Scan QR with GPay / PhonePe / Paytm</h4>
@@ -107,7 +105,7 @@
 
             </div>
 
-            {{-- Verify Action for UPI --}}
+            
             <div class="border-t border-slate-800/80 pt-5">
               <button type="button" @click="startPayment('upi')"
                       class="w-full rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 py-4 text-sm font-black transition-all shadow-lg shadow-emerald-500/10 flex items-center justify-center gap-2">
@@ -117,10 +115,10 @@
 
           </div>
 
-          {{-- 2. SECURE DEBIT / CREDIT CARD SIMULATOR --}}
+          
           <div x-show="activeTab == 'card'" x-transition class="space-y-6">
             
-            {{-- Interactive Card Visualizer --}}
+            
             <div class="relative w-full max-w-[340px] h-[190px] mx-auto rounded-2xl p-5 text-white flex flex-col justify-between shadow-2xl transition-transform duration-300 hover:scale-105"
                  style="background: linear-gradient(135deg, #1e293b 0%, #0c1524 100%); border: 1px solid rgba(251, 191, 36, 0.2); box-shadow: 0 20px 40px -15px rgba(0,0,0,0.7);">
               <div class="flex justify-between items-start">
@@ -145,7 +143,7 @@
               </div>
             </div>
 
-            {{-- Card Inputs Grid --}}
+            
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div class="sm:col-span-2">
                 <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Cardholder Name</label>
@@ -172,30 +170,30 @@
             <div class="border-t border-slate-800/80 pt-5">
               <button type="button" @click="startPayment('card')"
                       class="w-full rounded-xl bg-amber-400 py-4 text-sm font-black text-slate-950 hover:bg-amber-300 active:scale-95 transition-all shadow-lg shadow-amber-500/20 flex items-center justify-center gap-2">
-                🔒 Settle Charges via Secure Card Simulation (₹{{ number_format($shipment->cost, 2) }})
+                🔒 Settle Charges via Secure Card Simulation (₹<?php echo e(number_format($shipment->cost, 2)); ?>)
               </button>
             </div>
 
           </div>
 
-          {{-- 3. NETBANKING SIMULATOR --}}
+          
           <div x-show="activeTab == 'netbanking'" x-transition class="space-y-6">
             <div>
               <p class="text-xs font-bold uppercase text-slate-400 tracking-wider mb-3">Popular Retail Banking Portals</p>
               <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                @foreach([
+                <?php $__currentLoopData = [
                   'SBI' => '🏛️ State Bank of India',
                   'HDFC' => '🏢 HDFC Bank',
                   'ICICI' => '🏨 ICICI Bank',
                   'AXIS' => '🏫 Axis Bank'
-                ] as $code => $bankName)
-                  <button type="button" @click="selectedBank = '{{ $code }}'"
+                ]; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $code => $bankName): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                  <button type="button" @click="selectedBank = '<?php echo e($code); ?>'"
                           class="rounded-xl border p-4 text-center transition-all outline-none duration-150"
-                          :class="selectedBank == '{{ $code }}' ? 'bg-amber-400/10 border-amber-400 text-white' : 'border-slate-800 bg-slate-950/40 text-slate-400 hover:border-slate-700'">
-                    <div class="text-base font-black text-slate-200">{{ $code }}</div>
-                    <div class="text-[9px] text-slate-500 mt-1 truncate">{{ $bankName }}</div>
+                          :class="selectedBank == '<?php echo e($code); ?>' ? 'bg-amber-400/10 border-amber-400 text-white' : 'border-slate-800 bg-slate-950/40 text-slate-400 hover:border-slate-700'">
+                    <div class="text-base font-black text-slate-200"><?php echo e($code); ?></div>
+                    <div class="text-[9px] text-slate-500 mt-1 truncate"><?php echo e($bankName); ?></div>
                   </button>
-                @endforeach
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
               </div>
             </div>
 
@@ -215,7 +213,7 @@
             <div class="border-t border-slate-800/80 pt-5">
               <button type="button" @click="startPayment('netbanking')"
                       class="w-full rounded-xl bg-amber-400 py-4 text-sm font-black text-slate-950 hover:bg-amber-300 active:scale-95 transition-all shadow-lg shadow-amber-500/20 flex items-center justify-center gap-2">
-                🔒 Settle Charges via Netbanking Redirect (₹{{ number_format($shipment->cost, 2) }})
+                🔒 Settle Charges via Netbanking Redirect (₹<?php echo e(number_format($shipment->cost, 2)); ?>)
               </button>
             </div>
 
@@ -223,12 +221,12 @@
 
         </div>
 
-        {{-- Hidden Form for Simulated Submission --}}
-        <form id="simulate-form" action="{{ route('customer.shipments.pay-simulate') }}" method="POST" class="hidden">
-          @csrf
+        
+        <form id="simulate-form" action="<?php echo e(route('customer.shipments.pay-simulate')); ?>" method="POST" class="hidden">
+          <?php echo csrf_field(); ?>
         </form>
 
-        {{-- Footer SSL Tagline --}}
+        
         <div class="text-center pt-2">
           <p class="text-[10px] text-slate-500 flex items-center justify-center gap-2">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
@@ -238,37 +236,37 @@
 
       </div>
 
-      {{-- Right Column: Interactive Shipment Bill Sidebar (Spans 4 cols on desktop) --}}
+      
       <aside class="lg:col-span-4 rounded-2xl border border-slate-800 bg-slate-900/80 p-6 space-y-5">
         <h3 class="text-xs font-bold uppercase text-slate-400 tracking-wider">Shipment Details</h3>
         
         <div class="space-y-2.5 text-xs border-b border-slate-800/80 pb-4">
-          <div class="flex justify-between text-slate-400"><span>Tracking ID</span><span class="font-mono font-bold text-amber-400">{{ $shipment->tracking_number }}</span></div>
-          <div class="flex justify-between text-slate-400"><span>Route</span><span class="font-bold text-white">{{ $shipment->sender_city }} → {{ $shipment->receiver_city }}</span></div>
-          <div class="flex justify-between text-slate-400"><span>Carrier Partner</span><span class="font-semibold text-white">{{ $shipment->carrier?->name }}</span></div>
-          <div class="flex justify-between text-slate-400"><span>Service Tier</span><span class="font-semibold text-white capitalize">{{ $shipment->service_type }}</span></div>
-          <div class="flex justify-between text-slate-400"><span>Declared Weight</span><span class="font-semibold text-white">{{ $shipment->weight }} kg</span></div>
+          <div class="flex justify-between text-slate-400"><span>Tracking ID</span><span class="font-mono font-bold text-amber-400"><?php echo e($shipment->tracking_number); ?></span></div>
+          <div class="flex justify-between text-slate-400"><span>Route</span><span class="font-bold text-white"><?php echo e($shipment->sender_city); ?> → <?php echo e($shipment->receiver_city); ?></span></div>
+          <div class="flex justify-between text-slate-400"><span>Carrier Partner</span><span class="font-semibold text-white"><?php echo e($shipment->carrier?->name); ?></span></div>
+          <div class="flex justify-between text-slate-400"><span>Service Tier</span><span class="font-semibold text-white capitalize"><?php echo e($shipment->service_type); ?></span></div>
+          <div class="flex justify-between text-slate-400"><span>Declared Weight</span><span class="font-semibold text-white"><?php echo e($shipment->weight); ?> kg</span></div>
         </div>
 
         <div class="space-y-2 text-xs">
-          <div class="flex justify-between text-slate-400"><span>Base Fare</span><span class="font-semibold text-slate-300">₹{{ number_format($shipment->base_fare, 2) }}</span></div>
-          <div class="flex justify-between text-slate-400"><span>Weight Charge</span><span class="font-semibold text-slate-300">₹{{ number_format($shipment->weight_charge, 2) }}</span></div>
-          <div class="flex justify-between text-slate-400"><span>Distance Charge</span><span class="font-semibold text-slate-300">₹{{ number_format($shipment->distance_charge, 2) }}</span></div>
-          <div class="flex justify-between text-slate-400"><span>GST (18%)</span><span class="font-semibold text-slate-300">₹{{ number_format($shipment->gst_amount, 2) }}</span></div>
+          <div class="flex justify-between text-slate-400"><span>Base Fare</span><span class="font-semibold text-slate-300">₹<?php echo e(number_format($shipment->base_fare, 2)); ?></span></div>
+          <div class="flex justify-between text-slate-400"><span>Weight Charge</span><span class="font-semibold text-slate-300">₹<?php echo e(number_format($shipment->weight_charge, 2)); ?></span></div>
+          <div class="flex justify-between text-slate-400"><span>Distance Charge</span><span class="font-semibold text-slate-300">₹<?php echo e(number_format($shipment->distance_charge, 2)); ?></span></div>
+          <div class="flex justify-between text-slate-400"><span>GST (18%)</span><span class="font-semibold text-slate-300">₹<?php echo e(number_format($shipment->gst_amount, 2)); ?></span></div>
         </div>
 
         <div class="border-t border-slate-800 pt-4 flex justify-between items-baseline">
           <span class="text-xs font-bold text-white uppercase tracking-wide">Total Amount</span>
-          <span class="text-xl font-black text-amber-400">₹{{ number_format($shipment->cost, 2) }}</span>
+          <span class="text-xl font-black text-amber-400">₹<?php echo e(number_format($shipment->cost, 2)); ?></span>
         </div>
       </aside>
 
     </div>
   </div>
 </div>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@push('scripts')
+<?php $__env->startPush('scripts'); ?>
 <script>
   function paymentGateway() {
     return {
@@ -278,8 +276,8 @@
       cardName: '',
       cardExpiry: '',
       selectedBank: '',
-      cost: @json($shipment->cost),
-      trackingNumber: @json($shipment->tracking_number),
+      cost: <?php echo json_encode($shipment->cost, 15, 512) ?>,
+      trackingNumber: <?php echo json_encode($shipment->tracking_number, 15, 512) ?>,
       processing: false,
       loadingStep: '',
 
@@ -361,4 +359,6 @@
     };
   }
 </script>
-@endpush
+<?php $__env->stopPush(); ?>
+
+<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH D:\Swift-Ship\resources\views/customer/pay.blade.php ENDPATH**/ ?>

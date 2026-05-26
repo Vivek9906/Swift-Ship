@@ -21,6 +21,23 @@
                 <div class="flex justify-between"><dt class="text-slate-400">ETA</dt><dd class="text-white">{{ $shipment->estimated_delivery ? \Carbon\Carbon::parse($shipment->estimated_delivery)->format('D, d M Y') : 'TBD' }}</dd></div>
                 <div class="flex justify-between"><dt class="text-slate-400">Total Fare</dt><dd class="text-amber-400 font-bold">₹{{ number_format($shipment->cost, 2) }}</dd></div>
             </dl>
+
+            @if($shipment->payment?->status === 'pending' || $shipment->status === 'pending')
+                <div class="border-t border-slate-800 pt-4 mt-4 flex flex-col sm:flex-row gap-3">
+                    <a href="{{ route('customer.shipments.resume-payment', $shipment->id) }}" 
+                       class="flex-1 rounded-xl bg-amber-400 px-5 py-3.5 text-xs font-bold text-slate-950 hover:bg-amber-300 transition text-center shadow-lg shadow-amber-500/10">
+                        💳 Proceed to Payment
+                    </a>
+                    <form action="{{ route('customer.shipments.delete', $shipment->id) }}" method="POST" class="flex-1" onsubmit="return confirm('Are you sure you want to delete this pending shipment?');">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" 
+                                class="w-full rounded-xl border border-red-500/30 bg-red-500/5 px-5 py-3.5 text-xs font-bold text-red-400 hover:bg-red-500/10 hover:border-red-500/50 transition">
+                            🗑️ Delete Shipment
+                        </button>
+                    </form>
+                </div>
+            @endif
         </div>
 
         {{-- Tracking Timeline --}}

@@ -4,10 +4,10 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="csrf-token" content="{{ csrf_token() }}">
+  <meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
   <title>SwiftShip | Book Shipment</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  @vite(['resources/css/app.css', 'resources/js/app.js'])
+  <?php echo app('Illuminate\Foundation\Vite')(['resources/css/app.css', 'resources/js/app.js']); ?>
   <style>
     body {
       font-family: Inter, ui-sans-serif, system-ui, sans-serif;
@@ -83,15 +83,15 @@
 
 <body class="min-h-screen bg-slate-950 text-slate-100">
 
-  {{-- Minimal navbar --}}
+  
   <nav class="fixed top-0 left-0 right-0 z-50 bg-slate-900/95 backdrop-blur border-b border-slate-800">
     <div class="mx-auto max-w-7xl px-4 sm:px-6 flex h-14 items-center justify-between">
-      <a href="{{ route('home') }}" class="flex items-center gap-2">
+      <a href="<?php echo e(route('home')); ?>" class="flex items-center gap-2">
         <span
           class="grid h-7 w-7 place-items-center rounded bg-amber-400 font-mono font-black text-slate-950 text-xs">SS</span>
         <span class="text-sm font-extrabold text-white">Swift<span class="text-amber-400">Ship</span></span>
       </a>
-      <a href="{{ route('customer.dashboard') }}"
+      <a href="<?php echo e(route('customer.dashboard')); ?>"
         class="text-xs text-slate-400 hover:text-white transition flex items-center gap-1">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
           stroke-linecap="round" stroke-linejoin="round">
@@ -106,41 +106,42 @@
   <div class="pt-16 pb-12 min-h-screen">
     <div class="mx-auto max-w-3xl px-4 sm:px-6 py-8">
 
-      {{-- Step Indicator --}}
+      
       <div class="mb-8">
         <div class="flex items-center justify-between relative">
           <div class="absolute top-4 left-4 right-4 h-0.5 bg-slate-800 z-0">
             <div class="h-full bg-amber-400 transition-all duration-500"
               :style="'width:'+Math.max(0, (step-1)/3*100)+'%'"></div>
           </div>
-          @foreach(['Package Details', 'Specifications', 'Choose Carrier', 'Review & Pay'] as $i => $label)
+          <?php $__currentLoopData = ['Package Details', 'Specifications', 'Choose Carrier', 'Review & Pay']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $i => $label): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
             <div class="relative z-10 flex flex-col items-center gap-1.5">
               <div class="step-dot w-8 h-8" :class="{
-                 'border-amber-400 bg-amber-400 text-slate-950': step > {{ $i + 1 }},
-                 'border-amber-400 bg-amber-400/20 text-amber-400': step == {{ $i + 1 }},
-                 'border-slate-700 bg-slate-900 text-slate-500': step < {{ $i + 1 }}
+                 'border-amber-400 bg-amber-400 text-slate-950': step > <?php echo e($i + 1); ?>,
+                 'border-amber-400 bg-amber-400/20 text-amber-400': step == <?php echo e($i + 1); ?>,
+                 'border-slate-700 bg-slate-900 text-slate-500': step < <?php echo e($i + 1); ?>
+
                }">
-                <template x-if="step > {{ $i + 1 }}">
+                <template x-if="step > <?php echo e($i + 1); ?>">
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
                     stroke-linecap="round" stroke-linejoin="round">
                     <polyline points="20 6 9 17 4 12" />
                   </svg>
                 </template>
-                <template x-if="step <= {{ $i + 1 }}">
-                  <span class="text-xs font-bold">{{ str_pad($i + 1, 2, '0', STR_PAD_LEFT) }}</span>
+                <template x-if="step <= <?php echo e($i + 1); ?>">
+                  <span class="text-xs font-bold"><?php echo e(str_pad($i + 1, 2, '0', STR_PAD_LEFT)); ?></span>
                 </template>
               </div>
               <span class="text-xs font-medium hidden sm:block"
-                :class="step == {{ $i + 1 }} ? 'text-amber-400' : 'text-slate-500'">{{ $label }}</span>
+                :class="step == <?php echo e($i + 1); ?> ? 'text-amber-400' : 'text-slate-500'"><?php echo e($label); ?></span>
             </div>
-          @endforeach
+          <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         </div>
       </div>
 
-      <form id="booking-form" method="POST" action="{{ route('customer.shipments.store') }}" novalidate>
-        @csrf
+      <form id="booking-form" method="POST" action="<?php echo e(route('customer.shipments.store')); ?>" novalidate>
+        <?php echo csrf_field(); ?>
 
-        @if ($errors->any())
+        <?php if($errors->any()): ?>
           <div class="mb-5 rounded-xl border border-red-500/40 bg-red-500/10 p-4">
             <div class="flex items-center gap-2 text-red-400 font-bold mb-2">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
@@ -151,14 +152,14 @@
               Please fix the following errors:
             </div>
             <ul class="list-disc list-inside text-sm text-red-300">
-              @foreach ($errors->all() as $error)
-                <li>{{ $error }}</li>
-              @endforeach
+              <?php $__currentLoopData = $errors->all(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $error): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <li><?php echo e($error); ?></li>
+              <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </ul>
           </div>
-        @endif
+        <?php endif; ?>
 
-        {{-- STEP 1: Addresses --}}
+        
         <div class="step-panel" :class="step==1 ? 'active' : ''">
           <div class="rounded-2xl border border-slate-800 bg-slate-900/80 p-6 mb-4">
             <h2 class="text-lg font-bold text-white mb-5 flex items-center gap-2">
@@ -169,17 +170,17 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label class="field-label">Sender Name *</label>
-                <input type="text" name="sender_name" class="field-input" value="{{ auth()->user()->name }}" required
+                <input type="text" name="sender_name" class="field-input" value="<?php echo e(auth()->user()->name); ?>" required
                   placeholder="Your full name">
               </div>
               <div>
                 <label class="field-label">Sender Phone *</label>
-                <input type="tel" name="sender_phone" class="field-input" value="{{ auth()->user()->phone }}" required
+                <input type="tel" name="sender_phone" class="field-input" value="<?php echo e(auth()->user()->phone); ?>" required
                   placeholder="+91 9876543210">
               </div>
               <div class="sm:col-span-2">
                 <label class="field-label">Sender Email *</label>
-                <input type="email" name="sender_email" class="field-input" value="{{ auth()->user()->email }}"
+                <input type="email" name="sender_email" class="field-input" value="<?php echo e(auth()->user()->email); ?>"
                   required>
               </div>
               <div class="sm:col-span-2">
@@ -274,7 +275,7 @@
           </div>
         </div>
 
-        {{-- STEP 2: Package Specs --}}
+        
         <div class="step-panel" :class="step==2 ? 'active' : ''">
           <div class="rounded-2xl border border-slate-800 bg-slate-900/80 p-6">
             <h2 class="text-lg font-bold text-white mb-5">Package Specifications</h2>
@@ -282,9 +283,9 @@
               <div class="sm:col-span-2">
                 <label class="field-label">Package Type *</label>
                 <select name="package_type" class="field-input" required>
-                  @foreach(['Document', 'Small Parcel', 'Medium Box', 'Large Box', 'Fragile', 'Electronics', 'Clothing', 'Food & Perishable', 'Industrial'] as $type)
-                    <option value="{{ $type }}">{{ $type }}</option>
-                  @endforeach
+                  <?php $__currentLoopData = ['Document', 'Small Parcel', 'Medium Box', 'Large Box', 'Fragile', 'Electronics', 'Clothing', 'Food & Perishable', 'Industrial']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $type): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <option value="<?php echo e($type); ?>"><?php echo e($type); ?></option>
+                  <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </select>
               </div>
               <div>
@@ -331,80 +332,82 @@
           </div>
         </div>
 
-        {{-- STEP 3: Choose Carrier --}}
+        
         <div class="step-panel" :class="step==3 ? 'active' : ''">
           <div class="rounded-2xl border border-slate-800 bg-slate-900/80 p-6">
             <h2 class="text-lg font-bold text-white mb-2">Choose Carrier & Service</h2>
             <p class="text-xs text-slate-500 mb-5">Select the best option for your shipment</p>
 
-            {{-- Service type selector --}}
+            
             <div class="flex flex-wrap gap-2 mb-6">
-              @foreach(['standard' => 'Standard', 'express' => 'Express', 'economy' => 'Economy'] as $val => $label)
+              <?php $__currentLoopData = ['standard' => 'Standard', 'express' => 'Express', 'economy' => 'Economy']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $val => $label): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                 <button type="button" class="rounded-lg px-4 py-2 text-xs font-bold border transition"
-                  :class="serviceType=='{{ $val }}' ? 'bg-amber-400 text-slate-950 border-amber-400' : 'border-slate-700 text-slate-400 hover:border-amber-400/50'"
-                  @click="serviceType='{{ $val }}'; fetchFares()">{{ $label }}</button>
-              @endforeach
+                  :class="serviceType=='<?php echo e($val); ?>' ? 'bg-amber-400 text-slate-950 border-amber-400' : 'border-slate-700 text-slate-400 hover:border-amber-400/50'"
+                  @click="serviceType='<?php echo e($val); ?>'; fetchFares()"><?php echo e($label); ?></button>
+              <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </div>
 
             <input type="hidden" name="service_type" :value="serviceType">
             <input type="hidden" name="carrier_id" :value="selectedCarrier">
 
             <div class="space-y-3" x-show="!loadingFares">
-              @foreach($carriers as $carrier)
-                <div class="carrier-card" :class="selectedCarrier=='{{ $carrier->id }}' ? 'selected' : ''"
-                  @click="selectedCarrier='{{ $carrier->id }}'">
+              <?php $__currentLoopData = $carriers; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $carrier): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <div class="carrier-card" :class="selectedCarrier=='<?php echo e($carrier->id); ?>' ? 'selected' : ''"
+                  @click="selectedCarrier='<?php echo e($carrier->id); ?>'">
                   <div class="flex items-start justify-between gap-4">
                     <div class="flex items-center gap-3">
                       <div
                         class="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center text-lg font-black text-amber-400">
-                        {{ substr($carrier->name, 0, 1) }}
+                        <?php echo e(substr($carrier->name, 0, 1)); ?>
+
                       </div>
                       <div>
-                        <p class="font-bold text-white text-sm">{{ $carrier->name }}</p>
-                        <p class="text-xs text-slate-400">{{ $carrier->est_days_min }}–{{ $carrier->est_days_max }}
+                        <p class="font-bold text-white text-sm"><?php echo e($carrier->name); ?></p>
+                        <p class="text-xs text-slate-400"><?php echo e($carrier->est_days_min); ?>–<?php echo e($carrier->est_days_max); ?>
+
                           business days</p>
-                        <p class="text-xs text-slate-500">{{ ucfirst($carrier->type) }} · Rating {{ $carrier->rating }}/5
+                        <p class="text-xs text-slate-500"><?php echo e(ucfirst($carrier->type)); ?> · Rating <?php echo e($carrier->rating); ?>/5
                         </p>
                       </div>
                     </div>
                     <div class="text-right flex-shrink-0">
-                      <div x-show="fares['{{ $carrier->id }}']" class="text-lg font-black text-amber-400">
-                        ₹<span x-text="fares['{{ $carrier->id }}']?.total?.toFixed(0) ?? '—'"></span>
+                      <div x-show="fares['<?php echo e($carrier->id); ?>']" class="text-lg font-black text-amber-400">
+                        ₹<span x-text="fares['<?php echo e($carrier->id); ?>']?.total?.toFixed(0) ?? '—'"></span>
                       </div>
-                      <div x-show="!fares['{{ $carrier->id }}']" class="text-lg font-black text-slate-500">—</div>
+                      <div x-show="!fares['<?php echo e($carrier->id); ?>']" class="text-lg font-black text-slate-500">—</div>
                       <div class="text-xs text-slate-500 mt-0.5">
                         incl. GST
                       </div>
                     </div>
                   </div>
-                  {{-- Fare breakdown (collapsible) --}}
-                  <div x-show="selectedCarrier=='{{ $carrier->id }}' && fares['{{ $carrier->id }}']"
+                  
+                  <div x-show="selectedCarrier=='<?php echo e($carrier->id); ?>' && fares['<?php echo e($carrier->id); ?>']"
                     class="mt-4 pt-4 border-t border-slate-700/60">
                     <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
                       <div>
                         <p class="text-slate-500">Base Fare</p>
                         <p class="font-semibold text-white">₹<span
-                            x-text="fares['{{ $carrier->id }}']?.base_fare?.toFixed(0)"></span></p>
+                            x-text="fares['<?php echo e($carrier->id); ?>']?.base_fare?.toFixed(0)"></span></p>
                       </div>
                       <div>
                         <p class="text-slate-500">Weight</p>
                         <p class="font-semibold text-white">₹<span
-                            x-text="fares['{{ $carrier->id }}']?.weight_charge?.toFixed(0)"></span></p>
+                            x-text="fares['<?php echo e($carrier->id); ?>']?.weight_charge?.toFixed(0)"></span></p>
                       </div>
                       <div>
                         <p class="text-slate-500">Distance</p>
                         <p class="font-semibold text-white">₹<span
-                            x-text="fares['{{ $carrier->id }}']?.distance_charge?.toFixed(0)"></span></p>
+                            x-text="fares['<?php echo e($carrier->id); ?>']?.distance_charge?.toFixed(0)"></span></p>
                       </div>
                       <div>
                         <p class="text-slate-500">GST 18%</p>
                         <p class="font-semibold text-amber-400">₹<span
-                            x-text="fares['{{ $carrier->id }}']?.gst?.toFixed(0)"></span></p>
+                            x-text="fares['<?php echo e($carrier->id); ?>']?.gst?.toFixed(0)"></span></p>
                       </div>
                     </div>
                   </div>
                 </div>
-              @endforeach
+              <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </div>
             <div x-show="loadingFares" class="py-10 text-center">
               <div class="inline-flex items-center gap-2 text-slate-400 text-sm">
@@ -418,7 +421,7 @@
           </div>
         </div>
 
-        {{-- STEP 4: Review & Pay --}}
+        
         <div class="step-panel" :class="step==4 ? 'active' : ''">
           <div class="rounded-2xl border border-slate-800 bg-slate-900/80 p-6 space-y-5">
             <h2 class="text-lg font-bold text-white">Review & Confirm</h2>
@@ -443,26 +446,26 @@
               </template>
             </div>
 
-            {{-- Payment method --}}
+            
             <div>
               <p class="text-xs font-semibold uppercase text-slate-500 tracking-wider mb-3">Payment Method</p>
               <div class="space-y-2">
-                @foreach(['razorpay' => ['Pay Online (Razorpay)', 'Credit/Debit/UPI/Netbanking', 'text-amber-400'], 'cod' => ['Pay on Pickup (COD)', 'No payment now', 'text-emerald-400'], 'bank_transfer' => ['Bank Transfer', 'NEFT/IMPS after booking', 'text-blue-400']] as $val => [$label, $sub, $color])
+                <?php $__currentLoopData = ['razorpay' => ['Pay Online (Razorpay)', 'Credit/Debit/UPI/Netbanking', 'text-amber-400'], 'cod' => ['Pay on Pickup (COD)', 'No payment now', 'text-emerald-400'], 'bank_transfer' => ['Bank Transfer', 'NEFT/IMPS after booking', 'text-blue-400']]; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $val => [$label, $sub, $color]): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                   <label
                     class="flex items-center gap-3 rounded-xl border border-slate-700 bg-slate-900 px-4 py-3 cursor-pointer hover:border-amber-400/40 transition">
-                    <input type="radio" name="payment_method" value="{{ $val }}" class="text-amber-400" {{ $val === 'cod' ? 'checked' : '' }}>
+                    <input type="radio" name="payment_method" value="<?php echo e($val); ?>" class="text-amber-400" <?php echo e($val === 'cod' ? 'checked' : ''); ?>>
                     <div>
-                      <p class="text-sm font-semibold text-white">{{ $label }}</p>
-                      <p class="text-xs {{ $color }}">{{ $sub }}</p>
+                      <p class="text-sm font-semibold text-white"><?php echo e($label); ?></p>
+                      <p class="text-xs <?php echo e($color); ?>"><?php echo e($sub); ?></p>
                     </div>
                   </label>
-                @endforeach
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
               </div>
             </div>
           </div>
         </div>
 
-        {{-- Navigation --}}
+        
         <div class="flex items-center justify-between mt-6 gap-3">
           <button type="button" x-show="step > 1" @click="step--"
             class="flex items-center gap-2 rounded-xl border border-slate-700 px-6 py-3 text-sm font-semibold text-slate-300 hover:border-slate-500 hover:bg-slate-800 transition">
@@ -593,12 +596,12 @@
           if (!this.pickupCity || !this.destCity || !this.weightKg || !this.lengthCm || !this.widthCm || !this.heightCm) return;
 
           this.loadingFares = true;
-          const carriers = @json($carriers->pluck('id'));
+          const carriers = <?php echo json_encode($carriers->pluck('id'), 15, 512) ?>;
 
           const results = {};
           await Promise.all(carriers.map(async (id) => {
             try {
-              const res = await fetch('{{ route("booking.fare") }}', {
+              const res = await fetch('<?php echo e(route("booking.fare")); ?>', {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',
@@ -631,3 +634,4 @@
 </body>
 
 </html>
+<?php /**PATH D:\Swift-Ship\resources\views/customer/book.blade.php ENDPATH**/ ?>

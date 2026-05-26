@@ -134,4 +134,17 @@ class CustomerDashboardController extends Controller
 
         return back()->with('success', 'Profile updated successfully.');
     }
+
+    public function deleteShipment(string $id): RedirectResponse
+    {
+        $user = auth()->user();
+        $shipment = Shipment::where('user_id', $user->id)->findOrFail($id);
+
+        // Delete associated payment and tracking events
+        $shipment->payment()?->delete();
+        $shipment->trackingEvents()->delete();
+        $shipment->delete();
+
+        return redirect()->route('customer.dashboard')->with('success', 'Pending shipment deleted successfully.');
+    }
 }
